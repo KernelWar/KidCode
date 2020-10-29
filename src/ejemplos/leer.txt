@@ -1,0 +1,5 @@
+INICIO
+    var myVariable;
+    leer myVariable;
+FIN
+

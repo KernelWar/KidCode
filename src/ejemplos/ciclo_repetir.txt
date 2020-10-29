@@ -1,0 +1,13 @@
+INICIO
+    var miVariable;
+	miVariable = 0;
+	repetir var i = 0, hasta i mayor 10, inc 2 hacer
+		inc miVariable;
+		si(miVariable mayor 10) entonces
+			miVariable = 10;
+			repetir var i = 0, hasta i mayor 10, inc 2 hacer
+				hola = "hola";
+			fin_repetir;
+		fin_si;
+	fin_repetir;
+FIN

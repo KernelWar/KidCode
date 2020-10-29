@@ -1,0 +1,34 @@
+INICIO
+    var myVariableEntero = 10;
+    var myVariableFlotante = 10.10;
+    var myVariableCadena = "hola"; 
+
+    var myVariableEntero1, myVariableEntero2 = 10;
+    var myVariableFlotante1, myVariableFlotante2 = 10.10;
+    var myVariableCadena1, myVariableCadena2 = "hola"; 
+    
+    h = 10.2+10.1;
+    h = 10.2-10.1;
+    h = 10.2*10.1;
+    h = 10.2/10.1;
+
+    h = 10.2+10;
+    h = 10.2-10;
+    h = 10.2*10;
+    h = 10.2/10;
+
+    h = 10+10.3;
+    h = 10-10.3;
+    h = 10*10.3;
+    h = 10/10.3;
+
+
+    //enteros
+    h = 10+10;
+    h = 10-10;
+    h = 10*10;
+    h = 10/10;
+
+
+FIN
+

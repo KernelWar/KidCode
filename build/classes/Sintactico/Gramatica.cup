@@ -1,0 +1,1179 @@
+package Sintactico;
+import java_cup.runtime.*;
+import Lexico.Pintar;
+action code {:
+    
+:}
+parser code
+{:
+    public Symbol simboloAnterior;
+    public Nodo nodoPrincipal;
+    public Pintar estilo = new Pintar();
+    private int guia = 0;
+    private int conError = 0;
+    public String textError = "";
+    private int charError = 0;
+    
+    private int charCode = 0;
+    public int charErrorDetec(){
+        return charCode;
+    }
+    private void getGuia(){
+        System.out.println("guia :"+guia);
+        guia++;
+    }
+
+    
+
+     public void syntax_error(Symbol cur_token) {
+        //report_error("Syntax error", cur_token); 
+        
+        if(cur_token.sym != 0){
+            Scanner s = getScanner();
+        
+        
+        report_error("Syntax error", cur_token); 
+        this.charCode = cur_token.left;
+        
+        conError++;
+
+        String m = "Error "+conError+": \n";
+        int l = cur_token.right;
+        String v = cur_token.value.toString();
+
+        textError += m+"\tLinea: "+l+"\n\tCerca de: "+v+"\n";
+
+        int tam =textError.length();
+        estilo.insertarCodigo(textError);        
+        estilo.pintaRojoFuerte(charError,tam);
+
+        charError += tam;
+        }
+
+    }
+:}
+
+
+terminal PAL_INICIO_PROG,
+    PAL_FIN_PROG,
+    PAL_VARIABLE,
+    PAL_GRUPO,
+    LEER,
+    IMPRIMIR,
+    CICLO_REPETIR,
+    REPETIR_HASTA,
+    REPETIR_FIN,
+    CICLO_MIENTRAS,
+    INICIO_CICLO,
+    FIN_MIENTRAS,
+    CONDICION_SI,
+    CONDICION_INICIO,
+    CONDICION_SINO,
+    CONDICION_FIN,
+    OPER_REL,
+    OPER_ART_SUMA,
+    OPER_ART_RESTA,
+    OPER_ART_MUL,
+    OPER_ART_DIV,
+    OPER_ASIG_IGUAL,
+    OPER_ASIG_InDe,
+    OPER_AGRUP_PI,
+    OPER_AGRUP_PF, 
+    OPER_AGRUP_LLI,
+    OPER_AGRUP_LLF,
+    OPER_AGRUP_CI,
+    OPER_AGRUP_CF,
+    OPER_AGRUP_COMA, 
+    VALOR_ENT,
+    VALOR_FLO,
+    VALOR_STRING,
+    VALOR_LOG,
+    NOMBRE_VAR,
+    PUNTOYCOMA,
+    ERROR;
+
+non terminal INIT,PROGRAMA,CODIGO;
+//Declarar y/o Asignar
+non terminal ESTRUCTURAS, DECLARACION,LISTA_VARIABLES, ASIGNACION, EXP_ASIGNACION,INC_DEC,EXP_BASICA;
+
+//Tipo Array
+//Declarar Array
+non terminal DECLARACION_GRUPO, ASIGNACION_GRUPO, LISTA_VALORES,VALOR_GRUPO,INDEX;
+
+non terminal CONDICIONALES,LISTA_CONDICIONES,CONDICION_ALTA,CONDICION_MEDIA,CONDICION_BAJA;
+
+//Ciclos
+non terminal C_MIENTRAS,C_REPETIR;
+//Generales
+non terminal TIPO_VALOR, OPERADOR_ARITMETICO,VARIABLE_DA,R_INCDEC,LEER_DATO,IMPRIMIR_DATO,LISTA_IMPRECIONES,TIPO_VALOR_COMPATIBLE,LISTA_VALORES_EXP,EXP_ASIG_BASICA,EXP_ASIG_COMPLEJA;
+
+//Declaracion, Asignacion en ciclos
+non terminal DECL_ASIG_CICLO, ASIGNACION_CICLO,ASIG_CICLO;
+
+start with INIT;
+
+INIT ::= PROGRAMA:prog
+    {:
+        Nodo n1 = new Nodo("INIT","",parser.guia);
+        getGuia();
+        n1.addRaiz((Nodo) prog);
+        parser.nodoPrincipal = (Nodo) n1;
+        RESULT = n1;
+    :};
+
+PROGRAMA ::= PAL_INICIO_PROG:n1 CODIGO:raiz1 PAL_FIN_PROG:n2
+    {:
+        Nodo raiz = new Nodo("PROGRAMA","",parser.guia);
+        getGuia();
+        Nodo nd1 = new Nodo("PAL_INICIO_PROG",n1.toString(),parser.guia);  
+        getGuia();
+        Nodo nd2 = new Nodo("PAL_FIN_PROG",n2.toString(),parser.guia);
+        getGuia();
+        
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd2);
+        
+        
+        RESULT = raiz;
+    :};
+
+CODIGO ::= CODIGO:raiz1 ESTRUCTURAS:raiz2
+    {:
+        Nodo raiz = new Nodo("CODIGO","",parser.guia);
+        getGuia();
+        
+        raiz.addRaiz((Nodo) raiz1);
+        raiz.addRaiz((Nodo) raiz2);
+        
+        RESULT = raiz;
+        
+    :} | ESTRUCTURAS:raiz1
+    {:
+       Nodo raiz = new Nodo("CODIGO","",parser.guia);
+       getGuia(); 
+
+       raiz.addRaiz((Nodo) raiz1);
+       RESULT = raiz;
+    :};
+
+ESTRUCTURAS ::= 
+        IMPRIMIR_DATO:raiz1 PUNTOYCOMA
+        {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+            
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+            
+            RESULT = raiz;
+            System.out.println("[IMPRIMIR]");
+        :}
+        |LEER_DATO:raiz1 PUNTOYCOMA
+        {:  
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+
+            RESULT = raiz;
+            System.out.println("[LEER]");
+        :}
+        |DECLARACION:raiz1 PUNTOYCOMA {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+
+            RESULT = raiz;
+            System.out.println("[DECLARACION]");
+        :} | ASIGNACION:raiz1 PUNTOYCOMA 
+        {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+
+            RESULT = raiz;
+            System.out.println("[ASIGNACION]");
+        :} | DECLARACION_GRUPO:raiz1 PUNTOYCOMA
+        {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+
+            RESULT = raiz;
+            System.out.println("[DECLARACION_GRUPO]");
+        :}|ASIGNACION_GRUPO:raiz1 PUNTOYCOMA
+        {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+
+            RESULT = raiz;
+            System.out.println("[ASIGNACION GRUPO]");
+        :}
+        |INC_DEC:raiz1
+        {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            RESULT = raiz;
+            System.out.println("<INC_DEC>");
+        :}
+        | CONDICIONALES:raiz1 PUNTOYCOMA
+         {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+
+            RESULT = raiz;
+            System.out.println("<CONDICIONALES>");
+        :}|C_MIENTRAS:raiz1 PUNTOYCOMA
+        {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+
+            RESULT = raiz;
+            System.out.println("<CICLO MIENTRAS>");
+        :}|C_REPETIR:raiz1 PUNTOYCOMA
+        {:
+            Nodo raiz = new Nodo("ESTRUCTURAS","",parser.guia);
+            getGuia();
+            
+            Nodo n1 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+
+            raiz.addRaiz((Nodo)raiz1);
+            raiz.addRaiz(n1);
+
+            RESULT = raiz;
+            System.out.println("<CICLO REPETIR>");
+        :};
+INC_DEC ::= OPER_ASIG_InDe:n1 NOMBRE_VAR:n2 PUNTOYCOMA
+        {:
+            Nodo raiz = new Nodo("ASIGNACION_INC_DEC","",parser.guia);
+            getGuia();
+            
+            Nodo nd1 = new Nodo("INC/DEC",n1.toString(),parser.guia);
+            getGuia();
+
+            Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+            Nodo nd2 = new Nodo("NOMBRE_VAR",n2.toString(),parser.guia,sym);            
+            getGuia();
+
+            Nodo nd3 = new Nodo("PUNTO Y COMO",";",parser.guia);
+            getGuia();
+            
+            raiz.addRaiz(nd1);
+            raiz.addRaiz(nd2);
+            raiz.addRaiz(nd3);
+            
+
+            RESULT = raiz;
+            System.out.println("[INCREMENTO DECREMENTO]");
+        :};
+
+
+
+LEER_DATO ::= LEER:n1 NOMBRE_VAR:n2 
+    {:
+        Nodo raiz = new Nodo("LEER_DATO","",parser.guia);
+        getGuia();
+        
+        Nodo nd1 = new Nodo("LEER",n1.toString(),parser.guia);
+        getGuia();
+
+        Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+        Nodo nd2 = new Nodo("NOMBRE_VAR",n2.toString(),parser.guia,sym);
+        getGuia();
+        
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+
+        RESULT = raiz;
+        System.out.println("<LEER>");
+    :};
+
+IMPRIMIR_DATO ::= IMPRIMIR:n1 OPER_AGRUP_PI:n2 LISTA_IMPRECIONES:raiz1 OPER_AGRUP_PF:n3
+    {:
+        Nodo raiz = new Nodo("IMPRIMIR_DATO","",parser.guia);        
+        getGuia();       
+        
+        Nodo nd1 = new Nodo("IMPRIMIR",n1.toString(),parser.guia);
+        getGuia();  
+        
+        Nodo nd2 = new Nodo("OPER_AGRUP_PI",n2.toString(),parser.guia);
+        getGuia(); 
+        
+        Nodo nd3 = new Nodo("OPER_AGRUP_PF",n3.toString(),parser.guia);
+        getGuia(); 
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+        raiz.addRaiz((Nodo)raiz1);        
+        raiz.addRaiz(nd3);
+
+        RESULT = raiz;
+        System.out.println("<IMPRIMIR_DATO><IMPRIMIR><OPER_AGRUP_PI><LISTA_IMPRECIONES><OPER_AGRUP_PF>");
+    :};
+
+
+LISTA_IMPRECIONES ::= LISTA_IMPRECIONES:raiz1 OPER_AGRUP_COMA:n1 TIPO_VALOR:raiz2
+    {:
+        Nodo raiz = new Nodo("LISTA_IMPRECIONES","",parser.guia);        
+        getGuia();        
+        
+        Nodo nd1 = new Nodo("OPER_AGRUP_COMA",n1.toString(),parser.guia);
+        getGuia();
+        
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz2);        
+        RESULT = raiz;
+        System.out.println("<LISTA_IMPRECIONES><LISTA_IMPRECIONES><OPER_AGRUP_COMA><TIPO_VALOR>");
+    :}
+    |TIPO_VALOR:raiz1
+    {:
+       Nodo raiz = new Nodo("LISTA_IMPRECIONES","",parser.guia);        
+       getGuia(); 
+       raiz.addRaiz((Nodo)raiz1);
+       RESULT = raiz;
+       System.out.println("<LISTA_IMPRECIONES><TIPO_VALOR>");
+    :};
+
+DECLARACION_GRUPO ::= PAL_GRUPO:n1 LISTA_VARIABLES:raiz1
+    {:
+        Nodo raiz = new Nodo("DECLARACION_GRUPO","",parser.guia);        
+        getGuia();        
+        
+        Nodo nd1 = new Nodo("PAL_GRUPO",n1.toString(),parser.guia);
+        getGuia();
+        
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        RESULT = raiz;         
+        System.out.println("<DECLARACION_GRUPO><PAL_GRUPO> <LISTA_VARIABLES>");
+    :}
+    | PAL_GRUPO:n1 ASIGNACION_GRUPO:raiz1
+    {:
+        Nodo raiz = new Nodo("DECLARACION_GRUPO","",parser.guia);        
+        getGuia(); 
+        
+        Nodo nd1 = new Nodo("PAL_GRUPO",n1.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz1);        
+        RESULT = raiz;    
+        System.out.println("<DECLARACION_GRUPO><PAL_GRUPO> <ASIGNACION_GRUPO>");
+    :};
+
+VALOR_GRUPO ::= NOMBRE_VAR:n1 OPER_AGRUP_CI:n2 INDEX:raiz1 OPER_AGRUP_CF:n3
+    {:
+        Nodo raiz = new Nodo("DECLARACION_GRUPO","",parser.guia);        
+        getGuia(); 
+        
+        Nodo nd1 = new Nodo("NOMBRE_VAR",n1.toString(),parser.guia);
+        getGuia();
+        
+        Nodo nd2 = new Nodo("OPER_AGRUP_CI",n2.toString(),parser.guia);
+        getGuia();
+                
+        Nodo nd3 = new Nodo("OPER_AGRUP_CF",n3.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd3);
+        
+        RESULT = raiz;           
+        System.out.println("<VALOR_GRUPO><NOMBRE_VAR> <OPER_AGRUP_CI> <VALOR_ENT> <OPER_AGRUP_CF>");
+    :};
+
+INDEX ::= VALOR_ENT:n1
+    {:
+        Nodo raiz = new Nodo("INDEX","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("VALOR_ENT",n1.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);       
+        RESULT = raiz;  
+        System.out.println("<INDEX><VALOR_ENT>"); 
+    :}
+    |NOMBRE_VAR:n1
+    {:
+        Nodo raiz = new Nodo("INDEX","",parser.guia);        
+        getGuia();  
+        Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+        Nodo nd1 = new Nodo("NOMBRE_VAR",n1.toString(),parser.guia,sym);
+        getGuia();
+
+        raiz.addRaiz(nd1);       
+        RESULT = raiz; 
+        System.out.println("<INDEX><NOMBRE_VAR>"); 
+    :}
+    |EXP_ASIGNACION:raiz1
+    {:
+        Nodo raiz = new Nodo("INDEX","",parser.guia);        
+        getGuia();  
+        
+        raiz.addRaiz((Nodo)raiz1);       
+        RESULT = raiz;
+        System.out.println("<INDEX><EXP_ASIGNACION>");
+    :};
+
+DECLARACION ::= PAL_VARIABLE:n1 LISTA_VARIABLES:raiz1
+    {:
+        Nodo raiz = new Nodo("DECLARACION","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("PAL_VARIABLE",n1.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);       
+        raiz.addRaiz((Nodo)raiz1);       
+        RESULT = raiz;  
+        
+        
+        System.out.println("<DECLARACION><PAL_VARIABLE> <LISTA_VARIABLES>");
+    :}
+    | PAL_VARIABLE:n1 ASIGNACION:raiz1
+    {:
+        Nodo raiz = new Nodo("DECLARACION","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("PAL_VARIABLE",n1.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);       
+        raiz.addRaiz((Nodo)raiz1);       
+        RESULT = raiz;      
+        System.out.println("<DECLARACION><PAL_VARIABLE><ASIGNACION>");
+    :};
+
+
+ASIGNACION ::= LISTA_VARIABLES:raiz1 OPER_ASIG_IGUAL:n1 TIPO_VALOR:raiz2
+    {:
+        Nodo raiz = new Nodo("ASIGNACION","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("OPER_ASIG_IGUAL",n1.toString(),parser.guia);
+        getGuia();  
+
+        raiz.addRaiz((Nodo)raiz1);       
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz2);
+        
+        RESULT = raiz;
+        System.out.println("<ASIGNACION><LISTA_VARIABLES><OPER_ASIG_IGUAL><TIPO_VALOR>");
+    :}
+    |LISTA_VARIABLES:raiz1 OPER_ASIG_IGUAL:n1 EXP_ASIG_BASICA:raiz2
+    {:
+        Nodo raiz = new Nodo("ASIGNACION","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("OPER_ASIG_IGUAL",n1.toString(),parser.guia);
+        getGuia();        
+        
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz2);
+        RESULT = raiz;
+        System.out.println("<ASIGNACION><LISTA_VARIABLES><OPER_ASIG_IGUAL><TIPO_VALOR><OPERADOR_ARITMETICO><TIPO_VALOR>");
+    :}; 
+
+
+
+
+
+EXP_ASIG_BASICA ::= 
+    EXP_ASIG_BASICA:raiz1 EXP_ASIGNACION:raiz2
+    {:
+        Nodo raiz = new Nodo("EXP_ASIG_BASICA","",parser.guia);        
+        getGuia();  
+        raiz.addRaiz((Nodo)raiz1);    
+        raiz.addRaiz((Nodo)raiz2);    
+        RESULT = raiz; 
+    :}
+    |OPER_AGRUP_PI:n1  TIPO_VALOR:raiz1 LISTA_VALORES_EXP:raiz2 OPERADOR_ARITMETICO:raiz3 EXP_ASIGNACION:raiz4 OPER_AGRUP_PF:n2
+    {:
+        Nodo raiz = new Nodo("EXP_ASIG_BASICA","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("OPER_AGRUP_PI",n1.toString(),parser.guia);
+        getGuia();  
+        Nodo nd2 = new Nodo("OPER_AGRUP_PF",n2.toString(),parser.guia);
+        getGuia(); 
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz1);    
+        raiz.addRaiz((Nodo)raiz2);    
+        raiz.addRaiz((Nodo)raiz3);    
+        raiz.addRaiz((Nodo)raiz4);      
+        raiz.addRaiz(nd2);
+        RESULT = raiz;         
+    :}
+    |TIPO_VALOR:raiz1 LISTA_VALORES_EXP:raiz2 OPERADOR_ARITMETICO:raiz3 EXP_ASIGNACION:raiz4
+    {:
+        Nodo raiz = new Nodo("EXP_ASIG_BASICA","",parser.guia);        
+        getGuia();  
+        raiz.addRaiz((Nodo)raiz1);    
+        raiz.addRaiz((Nodo)raiz2);    
+        raiz.addRaiz((Nodo)raiz3);    
+        raiz.addRaiz((Nodo)raiz4);      
+        RESULT = raiz;         
+    :}
+    |TIPO_VALOR:raiz1 LISTA_VALORES_EXP:raiz2
+    {:
+        Nodo raiz = new Nodo("EXP_ASIG_BASICA","",parser.guia);        
+        getGuia();  
+        raiz.addRaiz((Nodo)raiz1);    
+        raiz.addRaiz((Nodo)raiz2);    
+        RESULT = raiz;         
+    :}|EXP_ASIGNACION:raiz1{:
+        Nodo raiz = new Nodo("EXP_ASIG_BASICA","",parser.guia);        
+        getGuia();  
+        raiz.addRaiz((Nodo)raiz1); 
+        RESULT = raiz; 
+    :};
+
+
+EXP_ASIGNACION ::= EXP_ASIGNACION:raiz1 OPERADOR_ARITMETICO:raiz2 EXP_BASICA:raiz3
+    {:
+        Nodo raiz = new Nodo("EXP_ASIGNACION","",parser.guia);        
+        getGuia();  
+
+        raiz.addRaiz((Nodo)raiz1);    
+        raiz.addRaiz((Nodo)raiz2);    
+        raiz.addRaiz((Nodo)raiz3);    
+
+        RESULT = raiz;         
+       System.out.println("<EXP_ASIGNACION>");   
+    :}
+    |OPER_AGRUP_PI:n1 EXP_ASIGNACION:raiz1 OPERADOR_ARITMETICO:raiz2 EXP_BASICA:raiz3 OPER_AGRUP_PF:n2
+    {:
+        Nodo raiz = new Nodo("EXP_ASIGNACION","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("OPER_AGRUP_PI",n1.toString(),parser.guia);
+        getGuia();  
+        Nodo nd2 = new Nodo("OPER_AGRUP_PF",n2.toString(),parser.guia);
+        getGuia(); 
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz1);    
+        raiz.addRaiz((Nodo)raiz2);    
+        raiz.addRaiz((Nodo)raiz3);    
+        raiz.addRaiz(nd2);
+        RESULT = raiz;         
+       System.out.println("<EXP_ASIGNACION>");   
+    :}    
+    |EXP_BASICA:raiz1
+    {:
+        Nodo raiz = new Nodo("EXP_ASIGNACION","",parser.guia);        
+        getGuia();  
+        raiz.addRaiz((Nodo)raiz1); 
+        RESULT = raiz;         
+        System.out.println("<EXP_ASIGNACION><EXP_BASICA>");     
+    :};
+
+EXP_BASICA ::=         
+    OPER_AGRUP_PI:n1 TIPO_VALOR:raiz1 LISTA_VALORES_EXP:raiz2 OPER_AGRUP_PF:n2
+    {:
+        Nodo raiz = new Nodo("EXP_BASICA","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("OPER_AGRUP_PI",n1.toString(),parser.guia);
+        getGuia();  
+        Nodo nd2 = new Nodo("OPER_AGRUP_PF",n2.toString(),parser.guia);
+        getGuia(); 
+        
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz1);        
+        raiz.addRaiz((Nodo)raiz2);
+        raiz.addRaiz(nd2);
+        RESULT = raiz;         
+        System.out.println("<EXP_BASICA>");   
+    :};
+
+LISTA_VALORES_EXP ::= 
+    LISTA_VALORES_EXP: raiz1 OPERADOR_ARITMETICO:raiz2 TIPO_VALOR:raiz3
+    {:
+        Nodo raiz = new Nodo("LISTA_VALORES_EXP","",parser.guia);        
+        getGuia(); 
+        raiz.addRaiz((Nodo)raiz1);        
+        raiz.addRaiz((Nodo)raiz2);
+        raiz.addRaiz((Nodo)raiz3);
+        RESULT = raiz;         
+        System.out.println("<LISTA_VALORES_EXP><LISTA_VALORES_EXP><OPERADOR_ARITMETICO><TIPO_VALOR>");   
+    :}    
+    |OPERADOR_ARITMETICO:raiz1 TIPO_VALOR:raiz2
+    {:
+        Nodo raiz = new Nodo("LISTA_VALORES_EXP","",parser.guia);        
+        getGuia(); 
+        raiz.addRaiz((Nodo)raiz1);        
+        raiz.addRaiz((Nodo)raiz2);
+        RESULT = raiz;    
+        System.out.println("<OPERADOR_ARITMETICO><TIPO_VALOR>");
+    :};
+
+
+
+
+LISTA_VARIABLES ::= LISTA_VARIABLES:raiz1 OPER_AGRUP_COMA:n1 NOMBRE_VAR:n2
+    {:
+        Nodo raiz = new Nodo("LISTA_VARIABLES","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("OPER_AGRUP_COMA",n1.toString(),parser.guia);
+        getGuia();
+        Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+        Nodo nd2 = new Nodo("NOMBRE_VAR",n2.toString(),parser.guia,sym);
+        getGuia();
+        
+        raiz.addRaiz((Nodo)raiz1);       
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);       
+        
+        RESULT = raiz;        
+        System.out.println("<LISTA_VARIABLES><LISTA_VARIABLES><OPER_AGRUP_COMA><NOMBRE_VAR>");
+    :}|NOMBRE_VAR:n1
+    {:
+        Nodo raiz = new Nodo("LISTA_VARIABLES","",parser.guia);        
+        getGuia();       
+        Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+        
+        Nodo nd1 = new Nodo("NOMBRE_VAR",n1.toString(),parser.guia,sym);
+        getGuia();   
+          
+             
+        raiz.addRaiz(nd1);
+       
+        
+        RESULT = raiz;
+        System.out.println("<LISTA_VARIABLES><NOMBRE_VAR>");
+        
+    :};
+
+
+
+ASIGNACION_GRUPO ::= LISTA_VARIABLES:raiz1 OPER_ASIG_IGUAL:n1 OPER_AGRUP_LLI:n2 LISTA_VALORES:raiz2 OPER_AGRUP_LLF:n3
+    {:
+        Nodo raiz = new Nodo("ASIGNACION_GRUPO","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("OPER_ASIG_IGUAL",n1.toString(),parser.guia);
+        getGuia();   
+        Nodo nd2 = new Nodo("OPER_AGRUP_LLI",n2.toString(),parser.guia);
+        getGuia();  
+        Nodo nd3 = new Nodo("OPER_AGRUP_LLF",n3.toString(),parser.guia);
+        getGuia();  
+        
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);        
+        raiz.addRaiz((Nodo)raiz2);
+        raiz.addRaiz(nd3);
+        RESULT = raiz;        
+        System.out.println("<ASIGNACION_GRUPO><LISTA_VARIABLES><OPER_ASIG_IGUAL><OPER_AGRUP_LLI><LISTA_VALORES><OPER_AGRUP_LLF>");
+    :}
+    |LISTA_VARIABLES:raiz1 OPER_ASIG_IGUAL:n1 OPER_AGRUP_LLI:n2 LISTA_VALORES:raiz2 OPERADOR_ARITMETICO:raiz3 LISTA_VALORES:raiz4 OPER_AGRUP_LLF:n3
+    {:
+        Nodo raiz = new Nodo("ASIGNACION_GRUPO","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("OPER_ASIG_IGUAL",n1.toString(),parser.guia);
+        getGuia();   
+        Nodo nd2 = new Nodo("OPER_AGRUP_LLI",n2.toString(),parser.guia);
+        getGuia();  
+        Nodo nd3 = new Nodo("OPER_AGRUP_LLF",n3.toString(),parser.guia);
+        getGuia();  
+        
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);        
+        raiz.addRaiz((Nodo)raiz2);
+        raiz.addRaiz((Nodo)raiz3);
+        raiz.addRaiz((Nodo)raiz4);
+        raiz.addRaiz(nd3);
+        RESULT = raiz;        
+        System.out.println("<ASIGNACION_GRUPO><LISTA_VARIABLES><OPER_ASIG_IGUAL><LISTA_VALORES><OPERADOR_ARITMETICO><LISTA_VALORES><OPER_AGRUP_LLF>");
+    :}
+    |LISTA_VARIABLES:raiz1 OPER_AGRUP_CI:n1 VALOR_ENT:n2 OPER_AGRUP_CF:n3 OPER_ASIG_IGUAL:n4 TIPO_VALOR:raiz2
+    {:
+        Nodo raiz = new Nodo("ASIGNACION_GRUPO","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("OPER_AGRUP_CI",n1.toString(),parser.guia);
+        getGuia();   
+        Nodo nd2 = new Nodo("VALOR_ENT",n2.toString(),parser.guia);
+        getGuia();  
+        Nodo nd3 = new Nodo("OPER_AGRUP_CF",n3.toString(),parser.guia);
+        getGuia(); 
+        Nodo nd4 = new Nodo("OPER_ASIG_IGUALF",n4.toString(),parser.guia);
+        getGuia(); 
+        
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);        
+        raiz.addRaiz(nd3);
+        raiz.addRaiz(nd4);
+        raiz.addRaiz((Nodo)raiz2);
+        
+        RESULT = raiz;         
+        System.out.println("<ASIGNACION_GRUPO><LISTA_VARIABLES><OPER_AGRUP_CI><VALOR_ENT><OPER_AGRUP_CF><OPER_ASIG_IGUAL><TIPO_VALOR>");
+    :};
+
+LISTA_VALORES ::= LISTA_VALORES:raiz1 OPER_AGRUP_COMA:n1 TIPO_VALOR:raiz2
+    {:
+        Nodo raiz = new Nodo("LISTA_VALORES","",parser.guia);        
+        getGuia();       
+        Nodo nd1 = new Nodo("OPER_AGRUP_COMA",n1.toString(),parser.guia);
+        getGuia();  
+        
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz2);
+        RESULT = raiz;   
+        System.out.println("<LISTA_VALORES><OPER_AGRUP_COMA><TIPO_VALOR>");
+    :}
+    |TIPO_VALOR:raiz1
+    {:
+        Nodo raiz = new Nodo("LISTA_VALORES","",parser.guia);        
+        getGuia();  
+        
+        raiz.addRaiz((Nodo)raiz1);
+        RESULT = raiz;          
+        System.out.println("<LISTA_VALORES><TIPO_VALOR>");
+    :};
+TIPO_VALOR_COMPATIBLE ::= 
+    VALOR_ENT:n1
+    {:
+        Nodo raiz = new Nodo("TIPO_VALOR_COMPATIBLE","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("VALOR_ENT",n1.toString(),parser.guia);
+        getGuia();  
+        
+
+        raiz.addRaiz(nd1);
+        RESULT = raiz;        
+        System.out.println("<TIPO_VALOR><TVALOR_ENT>");  
+    :}|VALOR_FLO:n1
+     {:
+        Nodo raiz = new Nodo("TIPO_VALOR_COMPATIBLE","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("VALOR_FLO",n1.toString(),parser.guia);
+        getGuia();  
+        raiz.addRaiz(nd1);
+        RESULT = raiz;        
+        System.out.println("<TIPO_VALOR><VALOR_FLO>");  
+    :}
+    |VALOR_GRUPO:n1
+    {:
+        Nodo raiz = new Nodo("TIPO_VALOR_COMPATIBLE","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("VALOR_GRUPO",n1.toString(),parser.guia);
+        getGuia();  
+        raiz.addRaiz(nd1);
+        RESULT = raiz;       
+        System.out.println("<TIPO_VALOR><VALOR_GRUPO>");  
+    :}
+    | NOMBRE_VAR:n1
+    {:
+        Nodo raiz = new Nodo("TIPO_VALOR_COMPATIBLE","",parser.guia);        
+        getGuia();  
+        Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+        Nodo nd1 = new Nodo("NOMBRE_VAR",n1.toString(),parser.guia,sym);
+        getGuia();  
+        raiz.addRaiz(nd1);
+        RESULT = raiz;        
+        System.out.println("<TIPO_VALOR><NOMBRE_VAR>");  
+    :}
+    ;
+
+TIPO_VALOR ::= 
+    TIPO_VALOR_COMPATIBLE:raiz1
+    {:
+        Nodo raiz = new Nodo("TIPO_VALOR","",parser.guia);        
+        getGuia();  
+        raiz.addRaiz((Nodo)raiz1);
+        RESULT = raiz;        
+        System.out.println("<TIPO_VALOR><TIPO_VALOR_COMPATIBLE>");  
+    :}
+     |VALOR_STRING:n1
+     {:
+        Nodo raiz = new Nodo("TIPO_VALOR","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("VALOR_STRING",n1.toString(),parser.guia);
+        getGuia();  
+        raiz.addRaiz(nd1);
+        RESULT = raiz;        
+        System.out.println("<TIPO_VALOR><VALOR_STRING>");  
+    :}|VALOR_LOG:n1
+    {:
+        Nodo raiz = new Nodo("TIPO_VALOR","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("VALOR_LOG",n1.toString(),parser.guia);
+        getGuia();  
+        raiz.addRaiz(nd1);
+        RESULT = raiz;         
+        System.out.println("<TIPO_VALOR><VALOR_LOG>");  
+    :};
+
+
+OPERADOR_ARITMETICO ::= OPER_ART_SUMA:n1
+    {:
+        Nodo raiz = new Nodo("OPERADOR_ARITMETICO","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("OPER_ART_SUMA",n1.toString(),parser.guia);
+        getGuia();   
+        
+        raiz.addRaiz(nd1);
+        RESULT = raiz; 
+       System.out.println("<OPERADOR_ARITMETICO><OPER_ART_SUMA>"); 
+    :}| OPER_ART_RESTA:n1 
+    {:
+        Nodo raiz = new Nodo("OPERADOR_ARITMETICO","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("OPER_ART_RESTA",n1.toString(),parser.guia);
+        getGuia();   
+        
+        raiz.addRaiz(nd1);
+        RESULT = raiz;        
+       System.out.println("<OPERADOR_ARITMETICO><OPER_ART_RESTA>"); 
+    :}| OPER_ART_MUL:n1 
+    {:
+        Nodo raiz = new Nodo("OPERADOR_ARITMETICO","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("OPER_ART_MUL",n1.toString(),parser.guia);
+        getGuia();   
+        
+        raiz.addRaiz(nd1);
+        RESULT = raiz;     
+       System.out.println("<OPERADOR_ARITMETICO><OPER_ART_MUL>"); 
+    :}| OPER_ART_DIV:n1
+    {:
+        Nodo raiz = new Nodo("OPERADOR_ARITMETICO","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("OPER_ART_DIV",n1.toString(),parser.guia);
+        getGuia();   
+        
+        raiz.addRaiz(nd1);
+        RESULT = raiz;        
+       System.out.println("<OPERADOR_ARITMETICO><OPER_ART_DIV>"); 
+    :};
+
+CONDICIONALES ::= CONDICION_SI:n1 OPER_AGRUP_PI:n2 LISTA_CONDICIONES:raiz1 OPER_AGRUP_PF:n3 CONDICION_INICIO:n4 CODIGO:raiz2 CONDICION_FIN:n5
+    {:
+        Nodo raiz = new Nodo("CONDICIONALES","",parser.guia);        
+        getGuia();  
+        Nodo nd1 = new Nodo("CONDICION_SI",n1.toString(),parser.guia);
+        getGuia();   
+        Nodo nd2 = new Nodo("OPER_AGRUP_PI",n2.toString(),parser.guia);
+        getGuia();   
+        Nodo nd3 = new Nodo("OPER_AGRUP_PF",n3.toString(),parser.guia);
+        getGuia();   
+        Nodo nd4 = new Nodo("CONDICION_INICIO",n4.toString(),parser.guia);
+        getGuia();   
+        Nodo nd5 = new Nodo("CONDICION_FIN",n5.toString(),parser.guia);
+        getGuia();   
+        
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd3);
+        raiz.addRaiz(nd4);
+        raiz.addRaiz((Nodo)raiz2);
+        raiz.addRaiz(nd5);
+        RESULT = raiz;         
+       System.out.println("<CONDICIONALES>CONDICION_SI OPER_AGRUP_PI LISTA_CONDICIONES OPER_AGRUP_PF CONDICION_INICIO CODIGO CONDICION_FIN"); 
+    :}
+    //|CONDICION_SI OPER_AGRUP_PI LISTA_CONDICIONES OPER_AGRUP_PF CONDICION_INICIO CODIGO CONDICION_SINO CODIGO CONDICION_FIN
+    |CONDICION_SI:n1 OPER_AGRUP_PI:n2 LISTA_CONDICIONES:raiz1 OPER_AGRUP_PF:n3 CONDICION_INICIO:n4 CODIGO:raiz2 CONDICION_SINO:n5 CODIGO:raiz3 CONDICION_FIN:n6 
+    {:
+        Nodo raiz = new Nodo("CONDICIONALES","",parser.guia);        
+        getGuia(); 
+        Nodo nd1 = new Nodo("CONDICION_SI",n1.toString(),parser.guia);
+        getGuia();
+        Nodo nd2 = new Nodo("OPER_AGRUP_PI",n2.toString(),parser.guia);
+        getGuia();
+        Nodo nd3 = new Nodo("OPER_AGRUP_PF",n3.toString(),parser.guia);
+        getGuia();
+        Nodo nd4 = new Nodo("CONDICION_INICIO",n4.toString(),parser.guia);
+        getGuia();
+        Nodo nd5 = new Nodo("CONDICION_SINO",n5.toString(),parser.guia);
+        getGuia();
+        Nodo nd6 = new Nodo("CONDICION_FIN",n6.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd3);
+        raiz.addRaiz(nd4);
+        raiz.addRaiz((Nodo)raiz2);
+        raiz.addRaiz(nd5);
+        raiz.addRaiz((Nodo)raiz3);
+        raiz.addRaiz(nd6);
+        RESULT = raiz;      
+       System.out.println("<CONDICIONALES>CONDICION_SI OPER_AGRUP_PI LISTA_CONDICIONES OPER_AGRUP_PF CONDICION_INICIO CODIGO CONDICION_SINO CODIGO CONDICION_FIN"); 
+    :};
+
+LISTA_CONDICIONES ::= CONDICION_ALTA:raiz1 
+    {:
+        Nodo raiz = new Nodo("LISTA_CONDICIONES","",parser.guia);        
+        getGuia();
+
+        raiz.addRaiz((Nodo)raiz1);
+        RESULT = raiz;
+        System.out.println("<condicion alta>CONDICION_ALTA ");
+    :}
+    |CONDICION_MEDIA:raiz1 
+    {: 
+        Nodo raiz = new Nodo("LISTA_CONDICIONES","",parser.guia);        
+        getGuia();
+        raiz.addRaiz((Nodo)raiz1);
+        RESULT = raiz;
+        System.out.println("<condicion media>CONDICION_MEDIA ");
+    :}
+    |CONDICION_BAJA:raiz1 
+    {:
+        Nodo raiz = new Nodo("LISTA_CONDICIONES","",parser.guia);        
+        getGuia();
+        raiz.addRaiz((Nodo)raiz1);
+        RESULT = raiz;
+        System.out.println("<condicion baja> CONDICION_BAJA ");
+    :}
+    |LISTA_CONDICIONES:raiz1 CONDICION_ALTA:raiz2 
+    {:
+        Nodo raiz = new Nodo("LISTA_CONDICIONES","",parser.guia);        
+        getGuia();
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz((Nodo)raiz2);
+        RESULT = raiz;
+        System.out.println("<lista><condicion alta>CONDICION_ALTA ");
+    :}
+    ;
+
+CONDICION_ALTA ::= CONDICION_MEDIA:raiz1 OPER_REL:n1 CONDICION_MEDIA:raiz2 
+    {:
+        Nodo raiz = new Nodo("CONDICION_ALTA","",parser.guia);        
+        getGuia();
+        Nodo nd1 = new Nodo("OPER_REL",n1.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz2);
+        RESULT = raiz;
+        System.out.println("<CONDICION_ALTA>CONDICION_MEDIA OPER_REL CONDICION_MEDIA");
+    :};
+
+CONDICION_MEDIA ::= OPER_AGRUP_PI:n1 CONDICION_BAJA:raiz1 OPER_AGRUP_PF:n2
+    {:
+        Nodo raiz = new Nodo("CONDICION_MEDIA","",parser.guia);        
+        getGuia();
+
+        Nodo nd1 = new Nodo("OPER_AGRUP_PI",n1.toString(),parser.guia);
+        getGuia();
+        Nodo nd2 = new Nodo("OPER_AGRUP_PF",n2.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd2);
+        RESULT = raiz;
+        System.out.println("<CONDICION_MEDIA>OPER_AGRUP_PI CONDICION_BAJA OPER_AGRUP_PF");
+    :};
+
+CONDICION_BAJA ::= TIPO_VALOR:raiz1 OPER_REL:n1 TIPO_VALOR:raiz2 
+    {:
+        Nodo raiz = new Nodo("CONDICION_BAJA","",parser.guia);        
+        getGuia();
+
+        Nodo nd1 = new Nodo("OPER_REL",n1.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz2);
+        RESULT = raiz;
+        System.out.println("<CONDICION_BAJA>TIPO_VALOR OPER_REL TIPO_VALOR");
+    :};
+
+C_MIENTRAS ::= 
+    //CICLO_MIENTRAS OPER_AGRUP_PI LISTA_CONDICIONES OPER_AGRUP_PF INICIO_CICLO CODIGO FIN_MIENTRAS
+    CICLO_MIENTRAS:n1 OPER_AGRUP_PI:n2 LISTA_CONDICIONES:raiz1 OPER_AGRUP_PF:n3 INICIO_CICLO:n4 CODIGO:raiz2 FIN_MIENTRAS:n5 
+    {:
+        Nodo raiz = new Nodo("C_MIENTRAS","",parser.guia);        
+        getGuia();
+        Nodo nd1 = new Nodo("CICLO_MIENTRAS",n1.toString(),parser.guia);
+        getGuia();
+        Nodo nd2 = new Nodo("OPER_AGRUP_PI",n2.toString(),parser.guia);
+        getGuia();
+        Nodo nd3 = new Nodo("OPER_AGRUP_PF",n3.toString(),parser.guia);
+        getGuia();
+        Nodo nd4 = new Nodo("INICIO_CICLO",n4.toString(),parser.guia);
+        getGuia();
+        Nodo nd5 = new Nodo("FIN_MIENTRAS",n5.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd3);
+        raiz.addRaiz(nd4);
+        raiz.addRaiz((Nodo)raiz2);
+        raiz.addRaiz(nd5);
+        RESULT = raiz;
+        System.out.println("<C_MIENTRAS>CICLO_MIENTRAS OPER_AGRUP_PI LISTA_CONDICIONES OPER_AGRUP_PF INICIO_CICLO CODIGO FIN_MIENTRAS");
+    :}; 
+
+C_REPETIR ::= 
+    //CICLO_REPETIR VARIABLE_DA OPER_AGRUP_COMA REPETIR_HASTA LISTA_CONDICIONES OPER_AGRUP_COMA R_INCDEC INICIO_CICLO CODIGO REPETIR_FIN
+    CICLO_REPETIR:n1 VARIABLE_DA:raiz1 OPER_AGRUP_COMA:n2 REPETIR_HASTA:n3 LISTA_CONDICIONES:raiz2 OPER_AGRUP_COMA:n4 R_INCDEC:raiz3 INICIO_CICLO:n5 CODIGO:raiz4 REPETIR_FIN:n6 
+    {:
+        Nodo raiz = new Nodo("C_REPETIR","",parser.guia);        
+        getGuia();
+        Nodo nd1 = new Nodo("CICLO_REPETIR",n1.toString(),parser.guia);
+        getGuia();
+        Nodo nd2 = new Nodo("OPER_AGRUP_COMA",n2.toString(),parser.guia);
+        getGuia();
+        Nodo nd3 = new Nodo("REPETIR_HASTA",n3.toString(),parser.guia);
+        getGuia();
+        Nodo nd4 = new Nodo("OPER_AGRUP_COMA",n4.toString(),parser.guia);
+        getGuia();
+        Nodo nd5 = new Nodo("INICIO_CICLO",n5.toString(),parser.guia);
+        getGuia();
+        Nodo nd6 = new Nodo("REPETIR_FIN",n6.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz1);
+        raiz.addRaiz(nd2);
+        raiz.addRaiz(nd3);
+        raiz.addRaiz((Nodo)raiz2);
+        raiz.addRaiz(nd4);
+        raiz.addRaiz((Nodo)raiz3);
+        raiz.addRaiz(nd5);
+        raiz.addRaiz((Nodo)raiz4);
+        raiz.addRaiz(nd6);
+        RESULT = raiz;
+        System.out.println("<C_REPETIR>CICLO_REPETIR VARIABLE_DA OPER_AGRUP_COMA REPETIR_HASTA LISTA_CONDICIONES OPER_AGRUP_COMA R_INCDEC INICIO_CICLO CODIGO REPETIR_FIN");
+    :};
+
+VARIABLE_DA ::= DECL_ASIG_CICLO:raiz1
+    {:
+        Nodo raiz = new Nodo("VARIABLE_DA","",parser.guia);
+        getGuia();
+        raiz.addRaiz((Nodo)raiz1);
+        RESULT = raiz;
+    :}
+    |ASIGNACION_CICLO:raiz1
+    {:
+        Nodo raiz = new Nodo("VARIABLE_DA","",parser.guia);
+        getGuia();
+        raiz.addRaiz((Nodo)raiz1);
+        RESULT = raiz;
+    :}    
+    |NOMBRE_VAR:n1 
+    {:
+        Nodo raiz = new Nodo("VARIABLE_DA","",parser.guia);
+        getGuia();
+        
+        Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+        Nodo nd1 = new Nodo("NOMBRE_VAR",n1.toString(),parser.guia,sym);            
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        RESULT = raiz;
+        System.out.println("<VARIABLE_DA><NOMBRE_VAR>");
+    :}; 
+
+DECL_ASIG_CICLO ::= PAL_VARIABLE:n1 NOMBRE_VAR:n2 ASIG_CICLO:raiz1 
+    {:
+        Nodo raiz = new Nodo("DECL_ASIG_CICLO","",parser.guia);
+        getGuia();
+        Nodo nd1 = new Nodo("PAL_VARIABLE",n1.toString(),parser.guia);
+        getGuia();
+        
+        Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+        Nodo nd2 = new Nodo("NOMBRE_VAR",n2.toString(),parser.guia,sym);            
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+        raiz.addRaiz((Nodo)raiz1);
+        
+        RESULT = raiz;
+        System.out.println("<DECL_ASIG_CICLO>PAL_VARIABLE NOMBRE_VAR OPER_ASIG_IGUAL VALOR_ENT");
+    :};
+ASIG_CICLO ::= OPER_ASIG_IGUAL:n1 VALOR_ENT:n2
+    {:
+        Nodo raiz = new Nodo("ASIG_CICLO","",parser.guia);
+        getGuia();
+        Nodo nd1 = new Nodo("OPER_ASIG_IGUAL",n1.toString(),parser.guia);
+        getGuia();
+        Nodo nd2 = new Nodo("VALOR_ENT",n2.toString(),parser.guia);
+        getGuia();
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+        RESULT = raiz;
+        System.out.println("<ASIG_CICLO>OPER_ASIG_IGUAL VALOR_ENT");
+    :};
+
+ASIGNACION_CICLO ::= NOMBRE_VAR:n1 ASIG_CICLO:raiz1  
+    {:
+        Nodo raiz = new Nodo("ASIGNACION_CICLO","",parser.guia);
+        getGuia();
+        
+        Symbol sym = new Symbol(((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).sym, n1left, n1right);
+        Nodo nd1 = new Nodo("NOMBRE_VAR",n1.toString(),parser.guia,sym);            
+        getGuia();
+     
+        raiz.addRaiz(nd1);
+        raiz.addRaiz((Nodo)raiz1);
+        RESULT = raiz;
+        System.out.println("<ASIGNACION_CICLO>NOMBRE_VAR ASIG_CICLO");
+    :};
+R_INCDEC ::= OPER_ASIG_InDe:n1 VALOR_ENT:n2 
+    {:
+        Nodo raiz = new Nodo("R_INCDEC","",parser.guia);
+        getGuia();
+        Nodo nd1 = new Nodo("OPER_ASIG_InDe",n1.toString(),parser.guia);
+        getGuia();
+        Nodo nd2 = new Nodo("VALOR_ENT",n2.toString(),parser.guia);
+        getGuia();
+
+        raiz.addRaiz(nd1);
+        raiz.addRaiz(nd2);
+        RESULT = raiz;
+        System.out.println("<R_INCDEC><OPER_ASIG_InDe VALOR_ENT>");
+    :};

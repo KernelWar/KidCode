@@ -1,0 +1,3 @@
+INICIO
+    var h = "hola mundo";
+FIN

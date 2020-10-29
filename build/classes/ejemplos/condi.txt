@@ -1,0 +1,8 @@
+INICIO
+    var myVariable;
+	si((myVariable mayor 10) Y (myVariable menor A))entonces
+		myVariable = 4;
+		inc myVariable;
+	fin_si
+FIN
+

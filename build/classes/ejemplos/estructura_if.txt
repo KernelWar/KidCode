@@ -1,0 +1,9 @@
+INICIO
+    var h = 0;
+    si(h mayor 10)entonces
+        h = 4;
+	imprimir("es mayor");
+    sino
+        h = 10;
+    fin_si;
+FIN

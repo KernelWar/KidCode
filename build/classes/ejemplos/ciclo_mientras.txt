@@ -1,0 +1,9 @@
+INICIO
+    var miVariable;
+	miVariable = 0;
+	mientras((miVariable igual 0) O (miVariable mayor 0))hacer
+		inc miVariable;
+	fin_mientras;
+FIN
+
+
