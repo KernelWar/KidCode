@@ -5,14 +5,14 @@ Software que integra un compilador con las siguientes caracteristicas:
 - Generador del árbol sintáctico
 - Gestion de errores e interfaz grafica para edición de código
 # Capturas
-- Estilos
+### Estilos
 <img width="200" src="capturas/estilos.PNG">
 
-- Interfaz
+### Interfaz
 <img width="600" src="capturas/interfaz.PNG">
 
-- Árbol sintactico
+### Árbol sintactico
 <img width="600" src="capturas/arbol sintactico.PNG">
                       
-- Código intermedio
+### Código intermedio
 <img width="600" src="capturas/codigo intermedio.PNG">
