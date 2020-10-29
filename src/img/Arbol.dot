@@ -1,68 +1,164 @@
 digraph G {node[shape=box, style=filled, color=Gray95]; edge[color=blue];rankdir=UD 
 
-node23[label="PAL_INICIO_PROG
+node62[label="PAL_INICIO_PROG
 <INICIO>"]
-node3[label="PAL_VARIABLE
+node8[label="PAL_VARIABLE
 <var>"]
 node1[label="NOMBRE_VAR
-<myVariable>"]
+<h>"]
 node0[label="LISTA_VARIABLES"]
-node2[label="DECLARACION"]
-node5[label="PUNTO Y COMO
+node6[label="OPER_ASIG_IGUAL
+<=>"]
+node3[label="VALOR_ENT
+<0>"]
+node2[label="TIPO_VALOR_COMPATIBLE"]
+node4[label="TIPO_VALOR"]
+node5[label="ASIGNACION"]
+node7[label="DECLARACION"]
+node10[label="PUNTO Y COMO
 <;>"]
-node4[label="ESTRUCTURAS"]
-node6[label="CODIGO"]
-node16[label="IMPRIMIR
-<imprimir>"]
-node17[label="OPER_AGRUP_PI
+node9[label="ESTRUCTURAS"]
+node11[label="CODIGO"]
+node52[label="CONDICION_SI
+<si>"]
+node53[label="OPER_AGRUP_PI
 <(>"]
-node8[label="VALOR_STRING
-<el valor de myVariable es: > "]
-node7[label="TIPO_VALOR"]
-node9[label="LISTA_IMPRECIONES"]
-node14[label="OPER_AGRUP_COMA
-<,>"]
-node11[label="NOMBRE_VAR
-<myVariable>"]
-node10[label="TIPO_VALOR_COMPATIBLE"]
-node12[label="TIPO_VALOR"]
-node13[label="LISTA_IMPRECIONES"]
-node18[label="OPER_AGRUP_PF
+node13[label="NOMBRE_VAR
+<h>"]
+node12[label="TIPO_VALOR_COMPATIBLE"]
+node14[label="TIPO_VALOR"]
+node19[label="OPER_REL
+<mayor>"]
+node16[label="VALOR_ENT
+<10>"]
+node15[label="TIPO_VALOR_COMPATIBLE"]
+node17[label="TIPO_VALOR"]
+node18[label="CONDICION_BAJA"]
+node20[label="LISTA_CONDICIONES"]
+node54[label="OPER_AGRUP_PF
 <)>"]
-node15[label="IMPRIMIR_DATO"]
-node20[label="PUNTO Y COMO
+node55[label="CONDICION_INICIO
+<entonces>"]
+node22[label="NOMBRE_VAR
+<h>"]
+node21[label="LISTA_VARIABLES"]
+node27[label="OPER_ASIG_IGUAL
+<=>"]
+node24[label="VALOR_ENT
+<4>"]
+node23[label="TIPO_VALOR_COMPATIBLE"]
+node25[label="TIPO_VALOR"]
+node26[label="ASIGNACION"]
+node29[label="PUNTO Y COMO
 <;>"]
-node19[label="ESTRUCTURAS"]
-node21[label="CODIGO"]
-node24[label="PAL_FIN_PROG
+node28[label="ESTRUCTURAS"]
+node30[label="CODIGO"]
+node35[label="IMPRIMIR
+<imprimir>"]
+node36[label="OPER_AGRUP_PI
+<(>"]
+node32[label="VALOR_STRING
+<es mayor> "]
+node31[label="TIPO_VALOR"]
+node33[label="LISTA_IMPRECIONES"]
+node37[label="OPER_AGRUP_PF
+<)>"]
+node34[label="IMPRIMIR_DATO"]
+node39[label="PUNTO Y COMO
+<;>"]
+node38[label="ESTRUCTURAS"]
+node40[label="CODIGO"]
+node56[label="CONDICION_SINO
+<sino>"]
+node42[label="NOMBRE_VAR
+<h>"]
+node41[label="LISTA_VARIABLES"]
+node47[label="OPER_ASIG_IGUAL
+<=>"]
+node44[label="VALOR_ENT
+<10>"]
+node43[label="TIPO_VALOR_COMPATIBLE"]
+node45[label="TIPO_VALOR"]
+node46[label="ASIGNACION"]
+node49[label="PUNTO Y COMO
+<;>"]
+node48[label="ESTRUCTURAS"]
+node50[label="CODIGO"]
+node57[label="CONDICION_FIN
+<fin_si>"]
+node51[label="CONDICIONALES"]
+node59[label="PUNTO Y COMO
+<;>"]
+node58[label="ESTRUCTURAS"]
+node60[label="CODIGO"]
+node63[label="PAL_FIN_PROG
 <FIN>"]
-node22[label="PROGRAMA"]
-node25[label="INIT"]
+node61[label="PROGRAMA"]
+node64[label="INIT"]
 
-node25->node22->node23
-node22->node21->node6->node4->node2->node3
-node2->node0->node1
+node64->node61->node62
+node61->node60->node11->node9->node7->node8
+node7->node5->node0->node1
 
-
-node4->node5
-
-
-node21->node19->node15->node16
-node15->node17
-node15->node13->node9->node7->node8
-
-
-node13->node14
-node13->node12->node10->node11
+node5->node6
+node5->node4->node2->node3
 
 
 
-node15->node18
 
-node19->node20
+node9->node10
 
 
-node22->node24
+node60->node58->node51->node52
+node51->node53
+node51->node20->node18->node14->node12->node13
+
+
+node18->node19
+node18->node17->node15->node16
+
+
+
+
+node51->node54
+node51->node55
+node51->node40->node30->node28->node26->node21->node22
+
+node26->node27
+node26->node25->node23->node24
+
+
+
+node28->node29
+
+
+node40->node38->node34->node35
+node34->node36
+node34->node33->node31->node32
+
+
+node34->node37
+
+node38->node39
+
+
+node51->node56
+node51->node50->node48->node46->node41->node42
+
+node46->node47
+node46->node45->node43->node44
+
+
+
+node48->node49
+
+
+node51->node57
+
+node58->node59
+
+
+node61->node63
 
 
 
