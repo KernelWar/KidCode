@@ -10,6 +10,10 @@ Las librerias requeridas se encuentran en la carpeta librerias
 - java-cup-11b.jar
 - java-cup-11b-runtime.jar
 - jflex-full-1.7.0.jar
+
+Para generar el árbol sintactico y poder visualizarlo en formato png instalar:
+- Graphviz2.38 https://graphviz.org/download/
+
 # Capturas
 ### Estilos
 <img width="200" src="capturas/estilos.PNG">
